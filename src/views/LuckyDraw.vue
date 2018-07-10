@@ -10,7 +10,7 @@
                       h1.title| {{$t('H1Title1')}}
                       h2.subtitle| {{$t('H2Title1')}} {{getCardsLeft}} {{$t('H2Title2')}}
                       h2.subtitle| {{$t('H2Title3')}}
-                      h1.title| {{ getPrice }} NAS / {{$t('CardUnit')}}
+                      h1.title| {{ getPrice }} ETH / {{$t('CardUnit')}}
             .container
                 .buttons(style="width: 18rem")
                   a.button.is-primary(@click="setQty(1)")|{{$t('Draw')}} 1 {{$t('CardUnit')}}
@@ -63,7 +63,7 @@ export default {
     async getPrice() {
       const contract = new Contract();
       const result = await contract.getDrawPrice();
-      return new BigNumber(result).div(1000000000000000000).toString();
+      return new BigNumber(result);
     },
   },
   computed: {
@@ -72,12 +72,14 @@ export default {
       return `${this.count} 张`;
     },
     getDisplayTotal() {
-      // return new BigNumber(this.getPrice).times(this.count).toNumber();
-      const d = new BigNumber(0.00001); // for mainnet
-//       const d = new BigNumber(0.0000000000000000000000000000000000000001); // for testnet
-      const a0 = new BigNumber(this.getPrice);
-      const n = new BigNumber(this.count);
-      return a0.times(n).plus((n.minus(1)).times(n).times(d).div(2));
+      // // return new BigNumber(this.getPrice).times(this.count).toNumber();
+      // const d = new BigNumber(0.00001); // for mainnet
+      // //       const d = new BigNumber(0.0000000000000000000000000000000000000001); // for testnet
+      // const a0 = new BigNumber(this.getPrice);
+      // const n = new BigNumber(this.count);
+      // return a0.times(n).plus((n.minus(1)).times(n).times(d).div(2));
+      // no dynamic price for now
+      return new BigNumber(this.getPrice).times(this.count);
     },
   },
   methods: {
@@ -95,103 +97,36 @@ export default {
     },
     async draw() {
       const contract = new Contract();
+      await contract.initialize();
       const referrer = Cookie.get('referrer') || '';
 
       // console.log("crytpresp:"+referrer);
-      const result = await contract.draw(referrer, this.getDisplayTotal);
-      // console.log("crytpresp00:"+result);
-
-      if (result != 'cancel') {
-        setTimeout(async () => {
-          const result1 = await contract.checkSerialNumber(result);
-          if (JSON.parse(result1).data.status == 1) {
-            if (referrer) {
-              const formData = new FormData();
-              formData.append('address', this.$store.state.me);
-              // formData.append('address', referrer);
-              formData.append('inviteaddress', referrer);// this.$route.params.address);
-              formData.append('cardnum', this.count);
-              formData.append('price', this.getPrice);
-              formData.append('witchnet', this.$store.getters.getContractNet);// "test");
-              formData.append('sn', result);
-              this.$http
-                .post(`${this.$store.getters.getServerURL}inviteshuihuadd.php`, formData)
-                .then((response) => {
-                  const res = response.body;
-                  console.log(res);
-                  alert('抽卡成功，到我的收藏里看看吧');
-                });
-            } else {
-              alert('抽卡成功，到我的收藏里看看吧');
-            }
-          }
-          // console.log("crytpresp:"+JSON.parse(result1)["msg"]);
-        }, 20000);
-      }
+      const result = await contract.draw({ value: this.getDisplayTotal });
+      return result;
     },
-
-
-     async airdrop() {
-      const contract = new Contract();
-      const referrer = Cookie.get('referrer') || '';
-
-      console.log("crytpresp:"+referrer);
-      const result = await contract.airdrop(referrer, this.getDisplayTotal);
-      console.log("crytpresp00:"+result);
-
-      if (result != 'cancel') {
-        setTimeout(async () => {
-          const result1 = await contract.checkSerialNumber(result);
-          if (JSON.parse(result1).data.status == 1) {
-            if (referrer) {
-              const formData = new FormData();
-              formData.append('address', this.$store.state.me);
-              // formData.append('address', referrer);
-              formData.append('inviteaddress', referrer);// this.$route.params.address);
-              formData.append('cardnum', this.count);
-              formData.append('price', this.getPrice);
-              formData.append('witchnet', this.$store.getters.getContractNet);// "test");
-              formData.append('sn', result);
-              this.$http
-                .post(`${this.$store.getters.getServerURL}inviteshuihuadd.php`, formData)
-                .then((response) => {
-                  const res = response.body;
-                  console.log(res);
-                  alert('抽卡成功，到我的收藏里看看吧');
-                });
-            } else {
-              alert('抽卡成功，到我的收藏里看看吧');
-            }
-          }
-          console.log("crytpresp:"+JSON.parse(result1)["msg"]);
-        }, 20000);
-      }
-    },
-
-
   },
 };
 </script>
 
 <style scoped>
-#draw{
-    background: #ecdaa8;
-    border-radius: 8px;
+#draw {
+  background: #ecdaa8;
+  border-radius: 8px;
 }
 .buttons {
-    margin: 1rem;
+  margin: 1rem;
 }
 
-#login{
-    width: 100%;
-    height: 93px;
-    padding: 22px;
-    background-color: #ecdaa8;
-    font-size: 20px;
-    margin-bottom: 27px;
-    border-radius: 8px;
-  }
-#login a{
+#login {
+  width: 100%;
+  height: 93px;
+  padding: 22px;
+  background-color: #ecdaa8;
+  font-size: 20px;
+  margin-bottom: 27px;
+  border-radius: 8px;
+}
+#login a {
   color: brown;
 }
 </style>

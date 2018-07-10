@@ -24,15 +24,19 @@ import { network } from './config';
 // }
 
 export default class CryptoHero extends Contract {
-  constructor() {
+  async initialize() {
+    // const contractName = 'CryptoGirl';
     const contractAddress = network[3].CryptoHeroCard;
-    super({
+    await super.initialize({
       abi, contractAddress,
     });
+    // return this;
   }
 
-  async draw() {
-    this.contract.methods.drawToken().send();
+  async draw({ value, from = this.account }) {
+    console.info(`Value is ${value.toString(10)}`);
+    const msg = { value, from };
+    this.contract.methods.drawToken().send(msg);
   }
 
   async getDrawCardsLeft() {
