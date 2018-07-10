@@ -14,6 +14,7 @@
   "dependencies": {
     "bignumber.js": "^6.0.0",
     "clipboard": "^2.0.1",
+    "dravatar": "^1.0.2",
     "ethereum-blockies-png": "^0.1.2",
     "js-cookie": "^2.2.0",
     "pug": "^2.0.3",
