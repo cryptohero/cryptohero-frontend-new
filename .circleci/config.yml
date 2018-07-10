@@ -51,7 +51,7 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "dd:6e:c3:a5:8a:ac:50:27:de:df:ee:71:0c:bb:00:2c"
+            # - "dd:6e:c3:a5:8a:ac:50:27:de:df:ee:71:0c:bb:00:2c"
       - attach_workspace: 
           at: ~/repo/dist
       - run:
@@ -63,11 +63,11 @@ jobs:
             cd ./dist/dist 
             git config --global user.email "bot@frankwei.xyz"
             git config --global user.name "Circle CI Deploy Bot"
-            echo "nas.cryptohero.pro" >> CNAME # add custom domain
+            echo "eth.cryptohero.pro" >> CNAME # add custom domain
             git init
             git add .
             git commit -m "Update website"
-            git push --force --quiet git@github.com:Andoromeda-Foundation/cryptohero-nas-site.git master:master
+            # git push --force --quiet git@github.com:Andoromeda-Foundation/cryptohero-eth-site.git master:master
   deploy-testing:
     <<: *defaults
     steps:
@@ -81,7 +81,7 @@ jobs:
             sudo npm i -g surge          
             cd ./dist/dist/
             # echo "testing.cryptohero.pro" >> CNAME # add custom domain
-            surge --project ./ --domain nas-test.cryptohero.pro
+            surge --project ./ --domain hero-dev.etherfen.com
 
 
 workflows:
