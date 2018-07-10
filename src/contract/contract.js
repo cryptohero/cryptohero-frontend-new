@@ -1,70 +1,28 @@
-import request from 'superagent';
-import 'nasa.js/dist/nasa';
-// import NebPay from 'nebpay.js';
+import web3 from 'web3';
 
-const nebPay = new Nasa.NebPay();
-
-const networkSetting = {
-  mainnet: {
-    rpcApi: 'https://mainnet.nebulas.io',
-  },
-  testnet: {
-    rpcApi: 'https://testnet.nebulas.io',
-  },
-};
+/**
+ * Contract Template
+ * @author: Frank Wei<frank@frankwei.xyz>
+ * ================================
+ *        WARNING!!!!
+ * DON'T EDIT THIS CONTRACT UNLESS
+ * YOU NEED TO CHANGE THE TEMPLATE
+ * ================================
+ * For Contract Template Usage,
+ * Simple Import this contract
+ * and Extends your contract class to this only exported Class
+ */
 
 export default class Contract {
-  constructor({ network = 'mainnet', contractAddress }) {
-    this.api = networkSetting[network].rpcApi;
-    this.contractAddress = contractAddress;
+  constructor() {
+    this.contract = null;
+    this.account = null;
   }
 
-  /**
-     * callContractMethod({from, functionName, args})
-     * Call a smart contract function.
-     * The smart contract must have been submited.
-     * Method calls are run only on the current node, not broadcast.
-     * @param: from - User that send Request
-     * @param: functionName - The name of the function
-     * @param: args - Function arguement, please enter arguement in ordered array
-     */
-  async call({
-    from = 'n1Z6SbjLuAEXfhX1UJvXT6BB5osWYxVg3F3', //
-    functionName,
-    value = '0',
-    args = [],
-  }) {
-    const { contractAddress, api } = this;
-    const to = contractAddress;
-    const txParams = {
-      value,
-      nonce: 0,
-      gasPrice: '1000000',
-      gasLimit: '2000000',
-      contract: { function: functionName, args: JSON.stringify(args) },
-    };
-    const { body } = await request
-      .post(`${api}/v1/user/call`)
-      .send(Object.assign({ from, to }, txParams));
-
-    return body.result.result;
-  }
-  /**
-     * send({ functionName, value = 0, data, options = { listener: undefined } }})
-     * Send tx to a smart contract function.
-     * The smart contract must have been submited.
-     * @param: functionName - The name of the function
-     * @param: value - How many nebulas NAS should cost
-     * @param: data - Function arguement, please enter arguement in ordered array
-     * @param: options - please check https://github.com/nebulasio/nebPay/blob/master/doc/NebPay%E4%BB%8B%E7%BB%8D.md#options
-     */
-  async send({ functionName, value = 0, data = [], options = { undefined } }) {
-    const resp = await nebPay.call(
-      this.contractAddress,
-      value,
-      functionName,
-      JSON.stringify(data),
-      options);
-    return resp;
+  // Things changes a lot in web3 v1.0 compared to v0.20
+  async initialize({ abi, contractAddress }) {
+    const accounts = await web3.eth.getAccounts();
+    this.account = accounts[0];
+    this.contract = new web3.eth.Contract(abi, contractAddress);
   }
 }
