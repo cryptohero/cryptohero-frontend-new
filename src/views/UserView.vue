@@ -1,7 +1,7 @@
 <template>
 <div>
 <section>
-  <div class="userContainer" v-if="!profile">
+  <div class="userContainer" v-if="!address">
     <div class="">
       <h2 class="title"  style="color: aliceblue">
         Loading Profile, please wait……
@@ -9,13 +9,11 @@
     </div>
   </div>
   <div class="userContainer" v-else>
-    <div class="" >
-      <a href="http://nasid.pro">
-          <img :src="profile.avatar" alt="Identicon" style="border-radius: 50%;  width: 100px;">
-      </a>
+    <div>
+          <img :src="getAvatar" width="100px" alt="Identicon" style="border-radius: 50%;">
     </div><br>
       <div class="">
-        <h2 class="title" style="color: aliceblue"> {{profile.nickname}} {{$t('Collect')}} </h2>
+        <!-- <h2 class="title" style="color: aliceblue"> {{profile.nickname}} {{$t('Collect')}} </h2> -->
         <p class="useraddress">{{$t('Content4')}}{{total}} / 108 {{$t('CardUnit')}} | {{$t('ownerCards')}}：{{allCardsCount}} {{$t('CardUnit')}}<el-button id="btn" type="success" round @click.native="claim()">{{$t('Finished')}}</el-button> </p>
         <p class="useraddress"> {{$t('key')}} {{address}}</p>
       </div>
@@ -125,7 +123,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import NasId from '@/contract/nasid';
+// import NasId from '@/contract/nasid';
 import LinkIdol from '@/contract/cryptohero';
 import CardItem from '@/components/CardItem';
 import PulseLoader from 'vue-spinner/src/PulseLoader';
@@ -134,6 +132,7 @@ import ElButton from "../../node_modules/element-ui/packages/button/src/button.v
 import ElInput from "../../node_modules/element-ui/packages/input/src/input.vue";
 import '../../node_modules/element-ui/lib/theme-chalk/index.css';
 import { Message } from 'element-ui';
+import getAvatarFromAddress from 'dravatar';
 export default {
   name: 'MyCollectionPage',
   data: () => ({
@@ -172,6 +171,11 @@ export default {
     Paginate,
   },
   asyncComputed: {
+    async getAvatar() {
+      const uri = await getAvatarFromAddress(this.address);
+      console.log(uri)
+      return uri;
+    },
     async getShareOfHolder() {
       const idol = new LinkIdol();
       const result = await idol.getShareOfHolder(this.address);
@@ -187,11 +191,11 @@ export default {
       const result = await idol.getTotalEarnByReference(this.address);
       return JSON.parse(result)||0;
     },
-    async profile() {
-      const nasId = new NasId();
-      const result = await nasId.fetchAccountDetail(this.address);
-      return result;
-    },
+    // async profile() {
+    //   const nasId = new NasId();
+    //   const result = await nasId.fetchAccountDetail(this.address);
+    //   return result;
+    // },
     async cardsInfo() {
       const idol = new LinkIdol();
       const result = await idol.getUserCards(this.address);

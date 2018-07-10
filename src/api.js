@@ -2,6 +2,21 @@ import Cookie from 'js-cookie';
 import { BigNumber } from 'bignumber.js';
 import request from 'superagent';
 import timeout from 'timeout-then';
+import web3 from '@/web3';
+import * as config from './contract/config.js';
+import CryptoHeroCardABI from './contract/abi/CryptoHeroCard.json';
+import ShareTokenABI from './contract/abi/ShareToken.json';
+
+// Sometimes, web3.version.network might be undefined,
+// as a workaround, use defaultNetwork in that case.
+let network = config.defaultNetwork;
+let CryptoHeroCardContract = new web3.eth.Contract(CryptoHeroCardABI, network.CryptoHeroCard);
+let ShareTokenContract = new web3.eth.Contract(ShareTokenABI, network.Shareable);
+web3.eth.net.getId().then((result) => {
+  network = config.network[result];
+  CryptoHeroCardContract = new web3.eth.Contract(CryptoHeroCardABI, network.CryptoHeroCard);
+  ShareTokenContract = new web3.eth.Contract(ShareTokenABI, network.Shareable);
+});
 
 export class NasTool {
   static fromNasToWei(value) {
@@ -38,19 +53,33 @@ export const init = async () => {
 
 init().then();
 
-export const getMe = async () => new Promise((resolve) => {
-  window.postMessage({
-    target: 'contentscript',
-    data: {
-    },
-    method: 'getAccount',
-  }, '*');
-  window.addEventListener('message', ({ data }) => {
-    if (data.data && data.data.account) {
-      resolve(data.data.account);
-    }
-  });
-});
+// export const getMe = async () => new Promise((resolve) => {
+//   window.postMessage({
+//     target: 'contentscript',
+//     data: {
+//     },
+//     method: 'getAccount',
+//   }, '*');
+//   window.addEventListener('message', ({ data }) => {
+//     if (data.data && data.data.account) {
+//       resolve(data.data.account);
+//     }
+//   });
+// });
+
+export const getMe = async () => {
+  if (!window.web3) {
+    throw Error('NO_METAMASK');
+  }
+  const me = {};
+  const accounts = await web3.eth.getAccounts();
+  me.address = accounts[0];
+  if (me.address) {
+    me.balance = await web3.eth.getBalance(me.address);
+    return me;
+  }
+  throw Error('METAMASK_LOCKED');
+};
 
 
 export const getAnnouncements = async () => {
