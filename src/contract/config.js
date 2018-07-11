@@ -11,8 +11,8 @@ export const network = {
   3: {
     default: true, // It will be used when no metaMask
     name: 'Ropsten Test Network',
-    CryptoHeroCard: '0x7Ab695C39f58346A32aEBA7BF39505676469840c',
-    Shareable: '0x14497e59F6911471EA49Cac92BE7c6d633Cd1975',
+    CryptoHeroCard: '0x5e8f584c74790966a0eb75d687093a2d639f85e0',
+    Shareable: '0xb659914473283649a991d741719df658ce6b9895',
     rpc: 'https://ropsten.infura.io/lTETGFVyQX99UKQ98BN4',
   },
   4: {
