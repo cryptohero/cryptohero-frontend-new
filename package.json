@@ -8,13 +8,13 @@
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
     "precommit": "lint-staged",
-    "lint": "eslint --ext --fix .js,.vue src",
+    "lint": "eslint --ext .js,.vue src",
     "build": "node build/build.js"
   },
   "lint-staged": {
     "src/**/*.{js,vue}": [
       "prettier --tab-width 4 --write",
-      "npm run lint",
+      "eslint --fix",
       "git add"
     ]
   },
