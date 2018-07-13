@@ -21,9 +21,9 @@ export default new Router({
   routes: [
     {
       name: 'Home',
-      redirect: { name: 'LuckyDraw' },
+      // redirect: { name: 'LuckyDraw' },
       path: '/',
-      // component: ListView,
+      component: ListView,
     },
     {
       name: 'LuckyDraw',
